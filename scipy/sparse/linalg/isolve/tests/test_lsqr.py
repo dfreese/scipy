@@ -89,6 +89,19 @@ def test_b_shapes():
     assert_almost_equal(norm(A.dot(x) - b.ravel()), 0)
 
 
+def test_initialization():
+    # Test the default setting is the same as zeros
+    x_ref = lsqr(G, b, show=show, atol=tol, btol=tol, iter_lim=maxit)
+    x0 = np.zeros(x_ref[0].shape)
+    x = lsqr(G, b, show=show, atol=tol, btol=tol, iter_lim=maxit, x0=x0)
+    assert_array_almost_equal(x_ref[0], x[0])
+
+    # Test warm-start with single iteration
+    x0 = lsqr(G, b, show=show, atol=tol, btol=tol, iter_lim=1)[0]
+    x = lsqr(G, b, show=show, atol=tol, btol=tol, iter_lim=maxit, x0=x0)
+    assert_array_almost_equal(x_ref[0], x[0])
+
+
 if __name__ == "__main__":
     svx = np.linalg.solve(G, b)
 
