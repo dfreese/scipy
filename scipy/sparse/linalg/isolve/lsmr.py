@@ -29,7 +29,7 @@ from .lsqr import _sym_ortho
 
 
 def lsmr(A, b, damp=0.0, atol=1e-6, btol=1e-6, conlim=1e8,
-         maxiter=None, show=False):
+         maxiter=None, show=False, x0=None):
     """Iterative solver for least-squares problems.
 
     lsmr solves the system of linear equations ``Ax = b``. If the system
@@ -86,7 +86,10 @@ def lsmr(A, b, damp=0.0, atol=1e-6, btol=1e-6, conlim=1e8,
         needed.
     show : bool, optional
         Print iterations logs if ``show=True``.
+    x0 : array_like, shape (n,), optional
+        Initial guess of x, if None zeros are used.
 
+        .. versionadded:: 0.19.0
     Returns
     -------
     x : ndarray of float
@@ -170,7 +173,12 @@ def lsmr(A, b, damp=0.0, atol=1e-6, btol=1e-6, conlim=1e8,
         print('atol = %8.2e                 conlim = %8.2e\n' % (atol, conlim))
         print('btol = %8.2e             maxiter = %8g\n' % (btol, maxiter))
 
-    u = b
+    if x0 is None:
+        x = zeros(n)
+        u = b
+    else:
+        x = atleast_1d(x0)
+        u = b - A.matvec(x)
     beta = norm(u)
 
     v = zeros(n)
@@ -196,7 +204,6 @@ def lsmr(A, b, damp=0.0, atol=1e-6, btol=1e-6, conlim=1e8,
 
     h = v.copy()
     hbar = zeros(n)
-    x = zeros(n)
 
     # Initialize variables for estimation of ||r||.
 
